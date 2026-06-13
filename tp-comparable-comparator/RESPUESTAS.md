@@ -14,3 +14,17 @@ El *overflow* ocurre cuando una operación matemática excede el límite máximo
 
 **Pregunta 5: ¿Qué patrón de diseño estás aplicando al usar un `Map<String, Comparator<T>>` en lugar de un `switch`? Explicá cómo se relaciona este patrón con el polimorfismo y por qué es preferible a la alternativa procedural.**
 Estamos aplicando el **Patrón Strategy**. En lugar de tener una estructura procedural estática como un `switch` o `if-else`, encapsulamos cada algoritmo de ordenamiento (`Comparator`) como una estrategia intercambiable y las registramos en un mapa. Esto explota el polimorfismo porque el servicio llama al método `compare` sin importarle qué implementación concreta se está ejecutando en tiempo de ejecución. Es preferible porque respeta el principio OCP: si queremos agregar un nuevo criterio de ordenamiento, simplemente agregamos una nueva entrada al `Map`, sin necesidad de modificar (y potencialmente romper) la lógica principal de ruteo.
+
+
+## Parte 2 — Comparable: el orden natural
+
+**Pregunta 2: ¿Por qué elegiste el atributo `promedio` como orden natural? ¿Qué pasaría si mañana un nuevo requisito pide ordenar por `cantidadMateriasAprobadas`? ¿Modificarías `compareTo`? ¿Qué consecuencias tendría?**
+
+Se eligió el `promedio` porque en un dominio de estudiantes universitarios, el mérito académico suele ser la forma más intuitiva u obvia de ordenarlos por defecto. 
+Si el requisito cambiara a `cantidadMateriasAprobadas`, **no sería recomendable modificar el `compareTo`**. Al hacerlo, alteraríamos el orden natural de la clase en todo el sistema. Cualquier otra parte de la aplicación que dependiera de este ordenamiento implícito (por ejemplo, si los estudiantes estuvieran guardados en un `TreeSet` o se ordenaran en otro módulo) sufriría efectos secundarios y su comportamiento se rompería silenciosamente.
+
+**Pregunta 3: `Comparable` nos ata a un único criterio de ordenamiento. ¿Qué problemas de diseño introduce esto si nuestro sistema necesitara ordenar la misma lista de estudiantes de 4 formas distintas según el contexto? Relacioná tu respuesta con los principios de responsabilidad única (SRP) y abierto/cerrado (OCP).**
+
+Atarse exclusivamente a `Comparable` genera varios problemas de diseño:
+1. **Viola el Principio de Responsabilidad Única (SRP):** La clase `Estudiante` debería tener la única responsabilidad de modelar el estado y comportamiento de un estudiante. Al meterle la lógica de cómo debe ser ordenado, le estamos asignando una responsabilidad extra que pertenece más bien a la presentación o a la lógica de negocio.
+2. **Viola el Principio Abierto/Cerrado (OCP):** Este principio dicta que las clases deben estar abiertas a la extensión pero cerradas a la modificación. Si necesitamos 4 formas distintas de ordenar a los estudiantes y solo usamos `Comparable`, estaríamos obligados a entrar a la clase `Estudiante` y modificar su código cada vez que el contexto cambie, lo cual es inviable e inestable.

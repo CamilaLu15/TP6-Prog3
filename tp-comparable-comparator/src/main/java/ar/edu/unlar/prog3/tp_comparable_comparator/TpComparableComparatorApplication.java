@@ -8,6 +8,6 @@ public class TpComparableComparatorApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TpComparableComparatorApplication.class, args);
+		
 	}
-
 }
