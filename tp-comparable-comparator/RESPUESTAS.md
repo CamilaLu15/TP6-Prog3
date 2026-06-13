@@ -28,3 +28,16 @@ Si el requisito cambiara a `cantidadMateriasAprobadas`, **no sería recomendable
 Atarse exclusivamente a `Comparable` genera varios problemas de diseño:
 1. **Viola el Principio de Responsabilidad Única (SRP):** La clase `Estudiante` debería tener la única responsabilidad de modelar el estado y comportamiento de un estudiante. Al meterle la lógica de cómo debe ser ordenado, le estamos asignando una responsabilidad extra que pertenece más bien a la presentación o a la lógica de negocio.
 2. **Viola el Principio Abierto/Cerrado (OCP):** Este principio dicta que las clases deben estar abiertas a la extensión pero cerradas a la modificación. Si necesitamos 4 formas distintas de ordenar a los estudiantes y solo usamos `Comparable`, estaríamos obligados a entrar a la clase `Estudiante` y modificar su código cada vez que el contexto cambie, lo cual es inviable e inestable.
+
+
+## Parte 3 — Comparator: estrategias externas
+
+**Pregunta 4: Explicá con tus palabras qué es un overflow de enteros, por qué el "truco de la resta" lo provoca, qué parte del contrato de `Comparator` rompe, y por qué `Integer.compare()` no sufre este problema.**
+
+Un *overflow* (desbordamiento) ocurre cuando una operación matemática excede el límite de capacidad del tipo de dato en memoria. En Java, un `int` tiene un valor máximo de `2,147,483,647`.
+
+El "truco de la resta" `(e1, e2) -> e1.getEdad() - e2.getEdad()` es peligroso porque, si restamos un número negativo a un número positivo muy grande (por ejemplo, `2147483647 - (-1)`), el resultado matemático real es `2147483648`. Como este número no cabe en un `int`, Java sufre un overflow, "da la vuelta" hacia los números negativos y devuelve `-2147483648`.
+
+Esto **rompe el contrato de `Comparator`**, que exige que si `a > b` devuelva un número positivo. Al devolver un número negativo por culpa del overflow, el método de ordenamiento posiciona los elementos al revés de lo que debería.
+
+`Integer.compare()` soluciona esto porque no utiliza restas matemáticas bajo el capó. En su lugar, usa operadores lógicos (`<`, `>`, `==`) para evaluar las magnitudes de forma segura y siempre devuelve explícitamente `-1`, `0` o `1`.
