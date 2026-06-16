@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 public class EstudianteService {
 
     
-    private List<Estudiante> estudiantes = new ArrayList<>();
+    private final List<Estudiante> estudiantes = new ArrayList<>();
 
    
-    private Map<String, Comparator<Estudiante>> estrategiasDeOrdenamiento = new HashMap<>();
+    private final Map<String, Comparator<Estudiante>> estrategiasDeOrdenamiento = new HashMap<>();
 
     @PostConstruct
     public void inicializar() {
@@ -34,15 +34,15 @@ public class EstudianteService {
         estudiantes.add(new Estudiante("LU-2024-010", "Lucía Fernández", 7.8, 21, 16));
 
        
-        estrategiasDeOrdenamiento.put("promedio", Comparator.comparing(Estudiante::getPromedio).reversed());
-        estrategiasDeOrdenamiento.put("edad", Comparator.comparing(Estudiante::getEdad));
+        estrategiasDeOrdenamiento.put("promedio", Comparator.comparingDouble(Estudiante::getPromedio).reversed());
+        estrategiasDeOrdenamiento.put("edad", Comparator.comparingInt(Estudiante::getEdad));
         estrategiasDeOrdenamiento.put("nombre", Comparator.comparing(Estudiante::getNombre));
         estrategiasDeOrdenamiento.put("materiasAprobadas", Comparator.comparingInt(Estudiante::getCantidadMateriasAprobadas));
         estrategiasDeOrdenamiento.put("legajo", Comparator.comparing(Estudiante::getLegajo));
     }
 
    
-    public List<Estudiante> ordenar(String sortBy, String order) {
+    public List<Estudiante> ordenar(List<Estudiante> listaAOrdenar, String sortBy, String order) {
         
         
         Comparator<Estudiante> comparator = estrategiasDeOrdenamiento.get(sortBy);
@@ -56,15 +56,16 @@ public class EstudianteService {
         comparator = comparator.thenComparing(Estudiante::getLegajo);
 
        
-        if ("desc".equalsIgnoreCase(order) && !sortBy.equals("promedio")) { 
+        if ("desc".equalsIgnoreCase(order)) { 
       
             comparator = comparator.reversed();
-        } else if ("asc".equalsIgnoreCase(order) && sortBy.equals("promedio")) {
-             comparator = comparator.reversed();
         }
-
-        return estudiantes.stream()
+        return listaAOrdenar.stream()
                 .sorted(comparator)
                 .collect(Collectors.toList());
+    }
+
+     public List<Estudiante> obtenerTodos() {
+        return this.estudiantes;
     }
 }

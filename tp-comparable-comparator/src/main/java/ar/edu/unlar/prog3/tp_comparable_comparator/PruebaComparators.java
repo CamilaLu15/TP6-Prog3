@@ -1,4 +1,3 @@
-
 package ar.edu.unlar.prog3.tp_comparable_comparator;
 
 import java.util.ArrayList;
@@ -6,11 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import ar.edu.unlar.prog3.tp_comparable_comparator.domain.Estudiante;
-import lombok.Getter;
-import lombok.Setter;
 
-@Setter
-@Getter
 public class PruebaComparators {
     public static void main(String[] args) {
         
@@ -31,7 +26,7 @@ public class PruebaComparators {
         Comparator<Estudiante> compNombre = Comparator.comparing(Estudiante::getNombre);
 
         
-        Comparator<Estudiante> compEdad = Comparator.comparing(Estudiante::getEdad);
+        Comparator<Estudiante> compEdad = Comparator.comparingInt(Estudiante::getEdad);
 
         
         
@@ -51,7 +46,7 @@ public class PruebaComparators {
 
         
         Comparator<Estudiante> compPromedioYNombre = Comparator
-            .comparing(Estudiante::getPromedio).reversed() 
+            .comparingDouble(Estudiante::getPromedio).reversed() 
             .thenComparing(Estudiante::getNombre); 
 
         System.out.println("\n--- Ordenado por Promedio Descendente, desempata por Nombre ---");
@@ -81,6 +76,11 @@ public class PruebaComparators {
         int resultadoMalo = restaTramposa.compare(viejo, joven);
         System.out.println("Resultado de la resta: " + resultadoMalo); 
         System.out.println("¿Es negativo? " + (resultadoMalo < 0) + " -> ¡ESTO ESTÁ MAL! Significa que el código cree que Integer.MAX_VALUE es menor que -1.");
+
+        System.out.println("\nProbando la forma correcta con Integer.compare():");
+        int resultadoBueno = Integer.compare(viejo.getEdad(), joven.getEdad());
+        System.out.println("Resultado con Integer.compare: " + resultadoBueno);
+        System.out.println("¿Es positivo? " + (resultadoBueno > 0) + " -> ¡CORRECTO! Respeta el contrato del Comparator sin sufrir overflow.");
 
     }
 }

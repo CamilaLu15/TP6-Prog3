@@ -5,7 +5,7 @@ import ar.edu.unlar.prog3.tp_comparable_comparator.service.EstudianteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,19 +21,20 @@ public class EstudianteController {
 
    
     @GetMapping
-    public ResponseEntity<?> obtenerEstudiantes(
+    public ResponseEntity<List<Estudiante>> obtenerEstudiantes(
             @RequestParam(defaultValue = "promedio") String sortBy,
             @RequestParam(defaultValue = "asc") String order) {
         
        
-        List<Estudiante> estudiantes = estudianteService.ordenar(sortBy, order);
-        return ResponseEntity.ok(estudiantes);
+        List<Estudiante> listaBase = estudianteService.obtenerTodos();
+        List<Estudiante> estudiantesOrdenados = estudianteService.ordenar(listaBase, sortBy, order);
+        return ResponseEntity.ok(estudiantesOrdenados);
     }
 
     
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> manejarErrorDeCriterio(IllegalArgumentException ex) {
-        Map<String, Object> errorResponse = new HashMap<>();
+        Map<String, Object> errorResponse = new LinkedHashMap<>();
         
     
         errorResponse.put("error", "Criterio de ordenamiento no válido");

@@ -41,3 +41,11 @@ El "truco de la resta" `(e1, e2) -> e1.getEdad() - e2.getEdad()` es peligroso po
 Esto **rompe el contrato de `Comparator`**, que exige que si `a > b` devuelva un número positivo. Al devolver un número negativo por culpa del overflow, el método de ordenamiento posiciona los elementos al revés de lo que debería.
 
 `Integer.compare()` soluciona esto porque no utiliza restas matemáticas bajo el capó. En su lugar, usa operadores lógicos (`<`, `>`, `==`) para evaluar las magnitudes de forma segura y siempre devuelve explícitamente `-1`, `0` o `1`.
+
+## Parte 4 — Integración con Spring Boot
+
+**Pregunta 5: ¿Qué patrón de diseño estás aplicando al usar un `Map<String, Comparator<T>>` en lugar de un `switch`? Explicá cómo se relaciona este patrón con el polimorfismo y por qué es preferible a la alternativa procedural.**
+
+La solución implementa el **Patrón Strategy**. Encapsulamos las diferentes lógicas de comparación (`Comparators`) como estrategias intercambiables y las registramos en un mapa usando su nombre de criterio como clave.
+Se relaciona íntimamente con el polimorfismo porque el `EstudianteService` extrae la estrategia correspondiente y ejecuta el método `.sort(comparator)` sin necesidad de conocer cuál es la implementación concreta detrás de esa interfaz. El comportamiento cambia en tiempo de ejecución de acuerdo al objeto recuperado.
+Es ampliamente preferible a un `switch` o múltiples `if-else` (alternativa procedural) porque respeta el principio **OCP**. Si a futuro se agrega un nuevo campo (por ejemplo, `fechaIngreso`), simplemente se añade una nueva entrada al mapa durante la inicialización, sin necesidad de tocar la lógica central del enrutamiento ni agregar ramas a una estructura de control estática.
